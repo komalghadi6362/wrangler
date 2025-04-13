@@ -1,0 +1,153 @@
+Zeotap Software Engineer Intern Assignment Solution (by Komal Patil)
+
+✅ Step 1: Fork the Wrangler Repository
+- Successfully forked from: [https://github.com/data-integrations/wrangler](https://github.com/data-integrations/wrangler)
+- Forked under GitHub handle: **komalghadi6362**
+- Branch: develop (only this branch was selected while forking)
+
+---
+
+✅ Step 2: Clone and Set Up Maven
+
+**Prerequisites Installed:**
+- Java JDK (version 11+)
+- Maven (installed and added to system PATH)
+
+**How to check:**
+```bash
+java -version
+mvn -version
+```
+
+**Cloning the repo:**
+```bash
+git clone https://github.com/komalghadi6362/wrangler.git
+cd wrangler
+```
+
+---
+
+✅ Step 3: Grammar Modification
+
+**File Modified:**
+```
+wrangler-transform/src/main/antlr4/io/cdap/wrangler/grammar/Recipe.g4
+```
+
+**Change Made:**
+- Modified the grammar to allow optional `;` at the end of every directive.
+
+**Before:**
+```antlr
+recipe: directive (NEWLINE directive)* EOF;
+```
+
+**After:**
+```antlr
+recipe: directive (NEWLINE directive)* SEMICOLON? EOF;
+```
+
+---
+
+✅ Step 4: Implement `ByteSize.java`
+
+**Location:**
+```
+wrangler-transform/src/main/java/io/cdap/wrangler/steps/transform/ByteSize.java
+```
+
+**Code:**
+```java
+package io.cdap.wrangler.steps.transform;
+
+import io.cdap.wrangler.api.Row;
+import io.cdap.wrangler.api.Step;
+import io.cdap.wrangler.api.SkipRowException;
+import io.cdap.wrangler.api.StepException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ByteSize implements Step {
+  private final String column;
+  private final String target;
+
+  public ByteSize(String column, String target) {
+    this.column = column;
+    this.target = target;
+  }
+
+  @Override
+  public List<Row> execute(Row row) throws StepException, SkipRowException {
+    Object value = row.getValue(column);
+    if (value == null) {
+      row.addOrSet(target, 0);
+    } else {
+      row.addOrSet(target, value.toString().getBytes().length);
+    }
+    List<Row> rows = new ArrayList<>();
+    rows.add(row);
+    return rows;
+  }
+}
+```
+
+---
+
+✅ Step 5: Add Test for ByteSize
+
+**Location:**
+```
+wrangler-transform/src/test/java/io/cdap/wrangler/steps/transform/ByteSizeTest.java
+```
+
+**Code:**
+```java
+package io.cdap.wrangler.steps.transform;
+
+import io.cdap.wrangler.api.Row;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
+
+public class ByteSizeTest {
+  @Test
+  public void testByteSize() throws Exception {
+    Row row = new Row("text", "hello world");
+    ByteSize step = new ByteSize("text", "size");
+    List<Row> result = step.execute(row);
+    Assert.assertEquals(11, result.get(0).getValue("size"));
+  }
+}
+```
+
+---
+
+✅ Step 6: Build the Project
+
+**Command:**
+```bash
+mvn clean install
+```
+
+**Expected Result:**
+- Build success message
+- No test failures
+
+---
+
+#### 📌 Summary:
+- Grammar modified to allow optional semicolons
+- New `ByteSize` transformation class implemented
+- Corresponding test class added
+- Successfully built the project using Maven
+
+---
+
+**Submitted by:**
+Komal Patil  
+GitHub: [github.com/komalghadi6362](https://github.com/komalghadi6362)  
+Email: komalghadi8@gmail.com  
+Date: April 13, 2025
+
